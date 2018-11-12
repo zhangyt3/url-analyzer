@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 
 import json
 
-from .utils import get_html
+from .utils import get_html, analyze_html
 
 # Create your views here.
 def index(request):
@@ -16,13 +16,10 @@ def index(request):
         # TODO: Check DB for cached results
 
         # TODO: Get the webpage HTML
-        html = get_html(url)
-        data = {
-            "html": html
-        }
-        
+        html = get_html(url)      
 
         # TODO: Process the HTML
+        data = analyze_html(html)
 
         # TODO: Cache in DB
 
