@@ -1,4 +1,6 @@
 import urllib.request
+from urllib.parse import urlparse
+import requests
 from bs4 import BeautifulSoup
 
 
@@ -28,17 +30,40 @@ def has_login_form(soup):
     return False
 
 
-def analyze_links(links):
+def is_internal_link(link, prefix):
+    parsed = urlparse(link)
+    if parsed.netloc == prefix or parsed.netloc == '':
+        return True
+    else:
+        return False
+
+
+def is_accessible(link):
+    request = requests.head(link)
+    return int(request.status_code) < 400
+
+
+def analyze_links(links, prefix):
+    """Counts the number of internal, external, and inaccessible links."""
     num_internal = 0
     num_external = 0
     num_inaccessible = 0
     for link in links:
-        # TODO: find # of each type of link
-        pass
+        new_link = link
+        if is_internal_link(link, prefix):
+            num_internal += 1
+
+            # If internal, append the domain so that accessibility check works
+            new_link = prefix + link
+        else:
+            num_external += 1
+
+        if not is_accessible(new_link):
+            num_inaccessible += 1
     
     return num_internal, num_external, num_inaccessible
 
-def analyze_html(html):
+def analyze_html(html, prefix):
     """Analyze the HTML passed in.
     Information retrieved:
       - HTML version
@@ -66,7 +91,7 @@ def analyze_html(html):
 
     # Links
     links = [a.get('href') for a in soup.find_all('a')]
-    num_internal, num_external, num_inaccessible = analyze_links(links)
+    num_internal, num_external, num_inaccessible = analyze_links(links, prefix)
     res['internal_links'] = num_internal
     res['external_links'] = num_external
     res['num_inaccessible'] = num_inaccessible

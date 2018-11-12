@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
 import json
+from urllib.parse import urlparse
 
 from .utils import get_html, analyze_html
 
@@ -12,6 +13,8 @@ def index(request):
     """
     try:
         url = request.POST['url']
+        parsed = urlparse(url)
+        prefix = parsed.scheme + "://"+ parsed.netloc
 
         # TODO: Check DB for cached results
 
@@ -19,7 +22,8 @@ def index(request):
         html = get_html(url)      
 
         # TODO: Process the HTML
-        data = analyze_html(html)
+
+        data = analyze_html(html, prefix)
 
         # TODO: Cache in DB
 
