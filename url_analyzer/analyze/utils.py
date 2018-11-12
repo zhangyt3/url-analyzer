@@ -30,12 +30,13 @@ def has_login_form(soup):
     return False
 
 
-def is_internal_link(link, prefix):
-    """Returns True if the link has the same prefix as the webpage
-    we are analyzing or if the link has no prefix.
+def is_internal_link(link, base_url):
+    """Returns True if the link has the same base URL as the webpage
+    we are analyzing or if the link has no base URL.
     """
     parsed = urlparse(link)
-    if parsed.netloc == prefix or parsed.netloc == '':
+    if parsed.scheme + "://" + parsed.netloc == base_url\
+       or parsed.netloc == '':
         return True
     else:
         return False
@@ -46,18 +47,18 @@ def is_accessible(link):
     return int(request.status_code) < 400
 
 
-def analyze_links(links, prefix):
+def analyze_links(links, base_url):
     """Counts the number of internal, external, and inaccessible links."""
     num_internal = 0
     num_external = 0
     num_inaccessible = 0
     for link in links:
         new_link = link
-        if is_internal_link(link, prefix):
+        if is_internal_link(link, base_url):
             num_internal += 1
 
             # If internal, append the domain so that we can check for accessibility later
-            new_link = prefix + link
+            new_link = base_url + link
         else:
             num_external += 1
 
@@ -66,7 +67,7 @@ def analyze_links(links, prefix):
     
     return num_internal, num_external, num_inaccessible
 
-def analyze_html(html, prefix):
+def analyze_html(html, base_url):
     """Analyze the HTML passed in.
     Information retrieved:
       - HTML version
@@ -94,7 +95,7 @@ def analyze_html(html, prefix):
 
     # Links
     links = [a.get('href') for a in soup.find_all('a')]
-    num_internal, num_external, num_inaccessible = analyze_links(links, prefix)
+    num_internal, num_external, num_inaccessible = analyze_links(links, base_url)
     res['internal_links'] = num_internal
     res['external_links'] = num_external
     res['num_inaccessible'] = num_inaccessible

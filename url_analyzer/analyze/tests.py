@@ -26,7 +26,7 @@ class HasLoginFormTests(TestCase):
     def test_has_login_form_no_form(self):
         html = "<!doctype html>\nHello World!"
         soup = BeautifulSoup(html, 'html.parser')
-        self.assertEqual(has_login_form(soup), False)
+        self.assertFalse(has_login_form(soup))
     
     def test_has_login_form_yes_form(self):
         html = """<!doctype html>
@@ -37,7 +37,7 @@ class HasLoginFormTests(TestCase):
         </form>
         """
         soup = BeautifulSoup(html, 'html.parser')
-        self.assertEqual(has_login_form(soup), True)
+        self.assertTrue(has_login_form(soup))
     
     def test_has_login_form_has_textfield(self):
         html = """<!doctype html>
@@ -47,4 +47,21 @@ class HasLoginFormTests(TestCase):
         </form>
         """
         soup = BeautifulSoup(html, 'html.parser')
-        self.assertEqual(has_login_form(soup), False)
+        self.assertFalse(has_login_form(soup))
+
+
+class IsInternalLinkTests(TestCase):
+    def test_is_internal_link_relative(self):
+        link = "/faq"
+        prefix = "http://example.com"
+        self.assertTrue(is_internal_link(link, prefix)) 
+    
+    def test_is_internal_link_absolute_internal(self):
+        link = "http://example.com/faq"
+        prefix = "http://example.com"
+        self.assertTrue(is_internal_link(link, prefix))
+    
+    def test_is_internal_link_external(self):
+        link = "http://notinternal.com"
+        prefix = "http://example.com"
+        self.assertFalse(is_internal_link(link, prefix))
