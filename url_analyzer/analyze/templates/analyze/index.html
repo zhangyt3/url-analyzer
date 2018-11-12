@@ -1,0 +1,7 @@
+<h1>URL Analyzer</h1>
+
+<form action="{% url 'analyze:index' %}" method="post">
+    {% csrf_token %}
+    <input type="text", name="url">
+    <input type="submit" value="Analyze">
+</form>
