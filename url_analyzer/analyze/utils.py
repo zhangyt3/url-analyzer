@@ -31,6 +31,9 @@ def has_login_form(soup):
 
 
 def is_internal_link(link, prefix):
+    """Returns True if the link has the same prefix as the webpage
+    we are analyzing or if the link has no prefix.
+    """
     parsed = urlparse(link)
     if parsed.netloc == prefix or parsed.netloc == '':
         return True
@@ -53,7 +56,7 @@ def analyze_links(links, prefix):
         if is_internal_link(link, prefix):
             num_internal += 1
 
-            # If internal, append the domain so that accessibility check works
+            # If internal, append the domain so that we can check for accessibility later
             new_link = prefix + link
         else:
             num_external += 1

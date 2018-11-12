@@ -14,15 +14,12 @@ def index(request):
     try:
         url = request.POST['url']
         parsed = urlparse(url)
-        prefix = parsed.scheme + "://"+ parsed.netloc
+        prefix = parsed.scheme + "://" + parsed.netloc
 
         # TODO: Check DB for cached results
 
-        # TODO: Get the webpage HTML
+        # Retrieve HTML and analyze it
         html = get_html(url)      
-
-        # TODO: Process the HTML
-
         data = analyze_html(html, prefix)
 
         # TODO: Cache in DB
