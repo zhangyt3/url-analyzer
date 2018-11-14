@@ -3,6 +3,7 @@
 ## API Endpoints
 
 **`/analyze`**
+
 | Method | Usage                  |
 |--------|------------------------|
 | GET    | View URL analysis form |
