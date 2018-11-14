@@ -27,7 +27,7 @@ def index(request):
             print("Found website in cache!")
 
             # Just return the cached result
-            site_model = Website.get(url=url)
+            site_model = Website.objects.get(url=url)
             site_data = model_to_dict(site_model)
             
             # Don't return URL and time cached to the user

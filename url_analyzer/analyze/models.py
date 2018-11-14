@@ -34,7 +34,7 @@ class Website(models.Model):
     links_external = models.PositiveIntegerField()
     links_inaccessible = models.PositiveIntegerField()
 
-    has_login_form = models.BooleanField()
+    has_login = models.BooleanField()
 
     def is_recent(self):
         """Returns true if the website analysis was cached in the
