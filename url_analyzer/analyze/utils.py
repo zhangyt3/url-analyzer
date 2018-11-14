@@ -96,9 +96,9 @@ def analyze_html(html, base_url):
     # Links
     links = [a.get('href') for a in soup.find_all('a')]
     num_internal, num_external, num_inaccessible = analyze_links(links, base_url)
-    res['internal_links'] = num_internal
-    res['external_links'] = num_external
-    res['num_inaccessible'] = num_inaccessible
+    res['links_internal'] = num_internal
+    res['links_external'] = num_external
+    res['links_inaccessible'] = num_inaccessible
 
     # Is there a login form?
     res['has_login'] = has_login_form(soup)

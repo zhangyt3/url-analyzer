@@ -1,9 +1,10 @@
 from django.db import models
+from django.utils import timezone
 
-# Create your models here.
+
 class Website(models.Model):
     url = models.URLField(max_length=1000)
-    time_cached = models.DateTimeField(auto_now=True)
+    time_cached = models.DateTimeField()
 
     # Only allow HTML version to be 5, 4, or unknown
     HTML5 = "5"
@@ -34,6 +35,11 @@ class Website(models.Model):
     links_inaccessible = models.PositiveIntegerField()
 
     has_login_form = models.BooleanField()
+
+    def is_recent(self):
+        """Returns true if the website analysis was cached in the
+        past 24 hours."""
+        return self.time_cached >= timezone.now() - datetime.timedelta(days=1)
 
 
 
