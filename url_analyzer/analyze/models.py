@@ -25,7 +25,7 @@ class Website(models.Model):
         (HTML4_TRANSITIONAL, "HTML 4.01 Transitional"),
         (HTML4_FRAMESET, "HTML 4.01 Frameset"),
         (XHTML1_STRICT, "XHTML 1.0 Strict"),
-        (XHTML1_TRANSITIONAL, "HTML 1.0 Transitional"),
+        (XHTML1_TRANSITIONAL, "XHTML 1.0 Transitional"),
         (XHTML1_FRAMESET, "XHTML 1.0 Frameset"),
         (XHTML1_1, "XHTML 1.1"),
         (HMTL_UNKNOWN, "Unknown"),

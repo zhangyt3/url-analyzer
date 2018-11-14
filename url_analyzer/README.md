@@ -5,12 +5,19 @@ With no prior Django experience, I first went through the [Writing your first Dj
 
 After the HTML analysis was working reasonably, I created a `Website` model to cache the results of analyzing a webpage in the database. This part was fairly straightforward, as it was explained well in the Django tutorial.
 
+Assumptions/decisions made:
+- The function that checks HTML version doesn't support every version of HTML
+    - Only supports HTML 4.01 and up
+    - Assumption is that there aren't many sites that still use HTML versions version less than 4.01
+- Cached results are not deleted immediately after they are stale (older than 24 hours)
+    - Currently, we only check if a DB entry is old when a query is made for it 
+    - After we retrieve the cached results, we check if it is stale
+    - If it is stale, we delete the entry
+    - Otherwise, we'll keep it in the DB and return the cached results
+- To check if a webpage has a login form, I just check if the webpage has an `input` field of type `password`
+    - A webpage generally should only have this if there is a login form
+    - And you generally can't login without this
 
+One problem I encountered was when checking if a link was accessible, some webpages would refuse a connection when too many requests are sent in a short period of time. To help fix this, I specified a `backoff_factor` such that a delay is applied in between attempts to connect. In some cases, this is still not enough though, and when that happens the current implementation just says that the link is inaccessible.
 
-
-
-
-## Other
-- Time
-- Problems
-- Corresponding solutions
+Time: 8-9 hours
