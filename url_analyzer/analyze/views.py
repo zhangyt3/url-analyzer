@@ -8,7 +8,7 @@ from analyze.models import Website
 import json
 from urllib.parse import urlparse
 
-from .utils import get_html, analyze_html
+from .utils import validate_url, get_html, analyze_html
 
 
 def index(request):
@@ -19,6 +19,14 @@ def index(request):
     """
     try:
         url = request.POST['url']
+
+        # If the URL is not valid, return an error response
+        if not validate_url(url):
+            return HttpResponse(json.dumps({
+                'reason': 'URL given is not valid.'
+            }), status=422, content_type='application/json')
+
+        # Extract the base URL
         parsed = urlparse(url)
         base_url = parsed.scheme + "://" + parsed.netloc
 

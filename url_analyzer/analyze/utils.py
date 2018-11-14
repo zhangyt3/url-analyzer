@@ -1,7 +1,19 @@
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+
 import urllib.request
 from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
+
+
+def validate_url(url):
+    validate = URLValidator()
+    try:
+        validate(url)
+        return True
+    except ValidationError:
+        return False
 
 
 def get_html(url):
@@ -9,6 +21,7 @@ def get_html(url):
     with urllib.request.urlopen(url) as f:
         f_bytes = f.read()
         return f_bytes.decode('ISO-8859-1')
+    
 
 
 def get_html_version(html):
