@@ -1,10 +1,18 @@
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
+
 import urllib.request
 from urllib.parse import urlparse
+from urllib3 import PoolManager
 import requests
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+
 from bs4 import BeautifulSoup
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def validate_url(url):
@@ -22,7 +30,6 @@ def get_html(url):
         f_bytes = f.read()
         return f_bytes.decode('ISO-8859-1')
     
-
 
 def get_html_version(html):
     """Returns the HTML version of the HTML given."""
@@ -48,7 +55,7 @@ def is_internal_link(link, base_url):
     we are analyzing or if the link has no base URL.
     """
     parsed = urlparse(link)
-    if parsed.scheme + "://" + parsed.netloc == base_url\
+    if str(parsed.scheme) + "://" + str(parsed.netloc) == base_url\
        or parsed.netloc == '':
         return True
     else:
@@ -56,8 +63,18 @@ def is_internal_link(link, base_url):
 
 
 def is_accessible(link):
-    request = requests.head(link)
-    return int(request.status_code) < 400
+    if not validate_url(link):
+        return False
+
+    sess = requests.Session()
+    retry = Retry(total=5,
+                backoff_factor=0.1,
+                status_forcelist=[500, 502, 503, 504],
+                raise_on_status=False,
+                raise_on_redirect=False)
+    sess.mount('http://', HTTPAdapter(max_retries=retry))        
+    response = sess.head(link)
+    return int(response.status_code) < 400
 
 
 def analyze_links(links, base_url):
@@ -66,12 +83,16 @@ def analyze_links(links, base_url):
     num_external = 0
     num_inaccessible = 0
     for link in links:
+        if link is None:
+            continue
+
         new_link = link
         if is_internal_link(link, base_url):
             num_internal += 1
 
             # If internal, append the domain so that we can check for accessibility later
-            new_link = base_url + link
+            if not link.startswith(base_url):
+                new_link = base_url + link
         else:
             num_external += 1
 
