@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 from .utils import get_html, analyze_html
 
-# Create your views here.
+
 def index(request):
     """
     Handles GET and POST requests.
@@ -20,33 +20,37 @@ def index(request):
     try:
         url = request.POST['url']
         parsed = urlparse(url)
-        prefix = parsed.scheme + "://" + parsed.netloc
+        base_url = parsed.scheme + "://" + parsed.netloc
+
+        site = None
 
         # Check DB for cached results
         if Website.objects.filter(url=url).exists():
-            print("Found website in cache!")
+            site = Website.objects.get(url=url)
 
-            # Just return the cached result
-            site_model = Website.objects.get(url=url)
-            site_data = model_to_dict(site_model)
-            
-            # Don't return URL and time cached to the user
-            site_data.pop('url', None)
-            site_data.pop('time_cached', None)
-        else:
-            print("Website not cached, fetching HTML")
-
-            # If not cached, retrieve HTML and analyze it
+            if site.is_recent():
+                # If the results are from the past 24 hours, just use them
+                site_data = model_to_dict(site)
+                
+                # But don't return id, URL, or time cached to the user
+                site_data.pop('id', None)
+                site_data.pop('url', None)
+                site_data.pop('time_cached', None)
+            else:
+                # If cached analysis is stale, delete it
+                site.delete()
+        
+        # If not cached or the cached results are old, we will
+        # retrieve the HTML and analyze it
+        if site is None:
             html = get_html(url)      
-            site_data = analyze_html(html, prefix)
+            site_data = analyze_html(html, base_url)
             
             # Cache analysis in DB
-            site_model = Website(**site_data)
-            site_model.url = url
-            site_model.time_cached = timezone.now()
-            site_model.save()
-                
-        # TODO: Delete old (not accessed in past 24 hours) results
+            site = Website(**site_data)
+            site.url = url
+            site.time_cached = timezone.now()
+            site.save()
 
         return HttpResponse(json.dumps(site_data), content_type='application/json')
     except KeyError:

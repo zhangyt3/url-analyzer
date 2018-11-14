@@ -39,7 +39,8 @@ class Website(models.Model):
     def is_recent(self):
         """Returns true if the website analysis was cached in the
         past 24 hours."""
-        return self.time_cached >= timezone.now() - datetime.timedelta(days=1)
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.time_cached <= now
 
 
 
