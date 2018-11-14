@@ -91,7 +91,7 @@ def analyze_html(html, base_url):
     for level in range(1, 7):
         tag = "h{}".format(level)
         header_tags = soup.find_all(tag)
-        res['num_{}'.format(tag)] = len(header_tags)
+        res['{}s'.format(tag)] = len(header_tags)
 
     # Links
     links = [a.get('href') for a in soup.find_all('a')]

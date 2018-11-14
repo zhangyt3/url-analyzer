@@ -53,15 +53,16 @@ class HasLoginFormTests(TestCase):
 class IsInternalLinkTests(TestCase):
     def test_is_internal_link_relative(self):
         link = "/faq"
-        prefix = "http://example.com"
-        self.assertTrue(is_internal_link(link, prefix)) 
+        base_url = "http://example.com"
+        self.assertTrue(is_internal_link(link, base_url)) 
     
     def test_is_internal_link_absolute_internal(self):
         link = "http://example.com/faq"
-        prefix = "http://example.com"
-        self.assertTrue(is_internal_link(link, prefix))
+        base_url = "http://example.com"
+        self.assertTrue(is_internal_link(link, base_url))
     
     def test_is_internal_link_external(self):
         link = "http://notinternal.com"
-        prefix = "http://example.com"
-        self.assertFalse(is_internal_link(link, prefix))
+        base_url = "http://example.com"
+        self.assertFalse(is_internal_link(link, base_url))
+
