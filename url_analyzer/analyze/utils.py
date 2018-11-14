@@ -11,9 +11,6 @@ from requests.adapters import HTTPAdapter
 
 from bs4 import BeautifulSoup
 
-import logging
-logger = logging.getLogger(__name__)
-
 
 def validate_url(url):
     validate = URLValidator()
@@ -33,10 +30,23 @@ def get_html(url):
 
 def get_html_version(html):
     """Returns the HTML version of the HTML given."""
-    if html.lower().startswith("<!doctype html>"):
+    html = html.lower()
+    if html.startswith("<!doctype html>"):
         return "HTML5"
-    elif html.startswith('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd>'):
+    elif html.startswith('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'.lower()):
         return "HTML 4.01 Strict"
+    elif html.startswith('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"'.lower()):
+        return "HTML 4.01 Transitional"
+    elif html.startswith('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"'.lower()):
+        return "HTML 4.01 Frameset"
+    elif html.startswith('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'.lower()):
+        return "XHTML 1.0 Strict"
+    elif html.startswith('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"'.lower()):
+        return "XHTML 1.0 Transitional"
+    elif html.startswith('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"'.lower()):
+        return "XHTML 1.0 Frameset"
+    elif html.startswith('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"'.lower()):
+        return "XHTML 1.1"
     else:
         return "Unknown"
 
@@ -66,15 +76,18 @@ def is_accessible(link):
     if not validate_url(link):
         return False
 
-    sess = requests.Session()
-    retry = Retry(total=5,
-                backoff_factor=0.1,
-                status_forcelist=[500, 502, 503, 504],
-                raise_on_status=False,
-                raise_on_redirect=False)
-    sess.mount('http://', HTTPAdapter(max_retries=retry))        
-    response = sess.head(link)
-    return int(response.status_code) < 400
+    try:
+        sess = requests.Session()
+        retry = Retry(total=5,
+                    backoff_factor=0.1,
+                    status_forcelist=[500, 502, 503, 504],
+                    raise_on_status=False,
+                    raise_on_redirect=False)
+        sess.mount('http://', HTTPAdapter(max_retries=retry))        
+        response = sess.head(link)
+        return int(response.status_code) < 400
+    except:
+        return False
 
 
 def analyze_links(links, base_url):

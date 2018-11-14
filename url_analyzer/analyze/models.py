@@ -8,13 +8,26 @@ class Website(models.Model):
     url = models.URLField(max_length=1000)
     time_cached = models.DateTimeField()
 
-    # Only allow HTML version to be 5, 4, or unknown
+    # Only allow these common DOCTYPE declarations
     HTML5 = "5"
-    HTML4 = "4"
+    HTML4_STRICT = "4S"
+    HTML4_TRANSITIONAL = "4T"
+    HTML4_FRAMESET = "4F"
+    XHTML1_STRICT = "X1S"
+    XHTML1_TRANSITIONAL = "X1T"
+    XHTML1_FRAMESET = "X1F"
+    XHTML1_1 = "X1_1"
     HMTL_UNKNOWN = "Unknown"
+
     HTML_VERSION_CHOICES = (
         (HTML5, "HTML5"),
-        (HTML4, "HTML 4.01 Strict"),
+        (HTML4_STRICT, "HTML 4.01 Strict"),
+        (HTML4_TRANSITIONAL, "HTML 4.01 Transitional"),
+        (HTML4_FRAMESET, "HTML 4.01 Frameset"),
+        (XHTML1_STRICT, "XHTML 1.0 Strict"),
+        (XHTML1_TRANSITIONAL, "HTML 1.0 Transitional"),
+        (XHTML1_FRAMESET, "XHTML 1.0 Frameset"),
+        (XHTML1_1, "XHTML 1.1"),
         (HMTL_UNKNOWN, "Unknown"),
     )
     html_version = models.CharField(
